@@ -22,16 +22,6 @@ type applicationDependencies struct {
 	config serverConfig
 	logger *slog.Logger
 }
-
-func (a *applicationDependencies)healthCheckHandler(w http.ResponseWriter,
-                                               r *http.Request) {
-    jsResponse := `{"status": "available", "environment": %q,
-                    "version": %q}`
-    jsResponse = fmt.Sprintf(jsResponse, a.config.environment, appVersion)
-    w.Header().Set("Content-Type", "application/json")
-    w.Write([]byte(jsResponse))
-}  
-
 func main() {
 	var settings serverConfig 
 
@@ -47,7 +37,7 @@ func main() {
 	}
 
 	router := http.NewServeMux()
-	router.HandleFunc("/v1/healthcheck", appInstance.healthCheckHandler)
+	router.HandleFunc("/v1/healthcheck", appInstance.healthcheckHandler)
 
 	apiServer := &http.Server{
 		Addr: fmt.Sprintf(":%d", settings.port),
