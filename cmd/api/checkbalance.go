@@ -47,27 +47,3 @@ func (a *applicationDependencies) checkBalanceHandler(
         a.serverErrorResponse(w, r, err)
     }
 }
-
-func validateBankAccount(userID int64, bankNumber int64) (float64, bool) {
-
-    // Fake database of accounts
-    accounts := map[int64]struct {
-        bankNumber int64
-        balance    float64
-    }{
-        1: {bankNumber: 111111, balance: 2500.75},
-        2: {bankNumber: 222222, balance: 980.50},
-        3: {bankNumber: 333333, balance: 15000.00},
-    }
-
-    account, exists := accounts[userID]
-    if !exists {
-        return 0, false
-    }
-
-    if account.bankNumber != bankNumber {
-        return 0, false
-    }
-
-    return account.balance, true
-}
