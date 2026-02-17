@@ -2,28 +2,39 @@
 package main
 
 import (
-  "encoding/json"
-  "fmt"
+  // "encoding/json"
   "net/http"
+  "time"
+  "math/rand"
   // import the data package which contains the definition for Comment
-  // "github.com/spector-asael/craboo-2/internal/data"
+  "github.com/spector-asael/craboo-2/internal/data"
 )
                  
-func (a *applicationDependencies)createCommentHandler(w http.ResponseWriter,
-                                                      r *http.Request) { 
-    // create a struct to hold a comment
-    // we use struct tags[``] to make the names display in lowercase
-    var incomingData struct {
-        Content  string  `json:"content"`
-        Author   string  `json:"author"`
-    }  
+func (a *applicationDependencies) createCommentHandler(
+    w http.ResponseWriter,
+    r *http.Request,
+) {
 
-   err := json.NewDecoder(r.Body).Decode(&incomingData)
-   if err != nil {
-       a.errorResponseJSON(w, r, http.StatusBadRequest, err.Error())
-       return
-   }
+    var incomingData data.Comment
 
-// for now display the result
-   fmt.Fprintf(w, "%+v\n", incomingData)
+    err := a.readJSON(w, r, &incomingData)
+    if err != nil {
+        a.badRequestResponse(w, r, err)
+        return
+    }
+
+    // Set server-controlled fields AFTER decoding
+    incomingData.ID = rand.Int63() % 99999
+    incomingData.CreatedAt = time.Now().UTC()
+    incomingData.Version = 1
+
+    err = a.writeJSON(
+        w,
+        http.StatusCreated,
+        envelope{"comment": incomingData},
+        nil,
+    )
+    if err != nil {
+        a.serverErrorResponse(w, r, err)
+    }
 }

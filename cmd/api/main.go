@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"math/rand"
 )
 
 const appVersion = "1.0.0"
@@ -23,6 +24,7 @@ type applicationDependencies struct {
 	logger *slog.Logger
 }
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	var settings serverConfig 
 
 	flag.IntVar(&settings.port, "port", 4000, "Server port")
